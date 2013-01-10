@@ -3,17 +3,17 @@
   {
     "name" : "contribCatalog",
 
-    "summary" : "Custom Application",
-    "description" : "This is a skeleton for a custom application with qooxdoo.",
+    "summary" : "contribCatalog webadmin",
+    "description" : "This is a webadmin for the contrib catalog which allows CRU operations (CRUD without D) for catalog entries",
 
-    "homepage" : "http://some.homepage.url/",
+    "homepage" : "https://github.com/qooxdoo/contrib-platform",
 
-    "license" : "SomeLicense",
+    "license" : "LGPL/EPL",
     "authors" :
     [
       {
-        "name" : "First Author (uid)",
-        "email" : "first.author@some.domain"
+        "name" : "Richard Sternagel (rsternagel)",
+        "email" : "richard.sternagel@1und1.de"
       }
     ],
 
