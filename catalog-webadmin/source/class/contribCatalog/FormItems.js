@@ -100,7 +100,7 @@ qx.Class.define("contribCatalog.FormItems", {
 
       // display all contribs
       this.__contribArea = new qx.ui.form.TextArea();
-      this.__contribArea.setReadOnly(true);
+      this.__setReadOnlyAndDisableFor(this.__contribArea, true);
       this.__contribArea.setWidth(450);
       this.__contribArea.setHeight(300);
       groupBoxStoreState.add(this.__contribArea);
@@ -113,6 +113,7 @@ qx.Class.define("contribCatalog.FormItems", {
 
         contribModel.bind("name", this.__nameField, "value");
         contribModel.bind("projecturl", this.__urlField, "value");
+        this.__setReadOnlyAndDisableFor(this.__nameField, true);
 
         this.__categoryBoxController.setSelection(new qx.data.Array([contribModel.getCategory()]));
 
@@ -171,12 +172,12 @@ qx.Class.define("contribCatalog.FormItems", {
 
         var selectedItem = this.__versionBox.getSelection()[0].getLabel();
         if (selectedItem.indexOf("New") === 0) {
+          this.__setReadOnlyAndDisableFor(this.__downloadsVersionField, false);
           this.__downloadsVersionField.resetValue();
-          this.__downloadsVersionField.setReadOnly(false);
           this.__downloadsUrlField.resetValue();
         } else {
           this.__downloadsVersionField.setValue(selectedItem);
-          this.__downloadsVersionField.setReadOnly(true);
+          this.__setReadOnlyAndDisableFor(this.__downloadsVersionField, true);
         }
       }, this);
 
@@ -209,12 +210,23 @@ qx.Class.define("contribCatalog.FormItems", {
         if (selectedItem.indexOf("New") === 0) {
           this.__formEntry.reset();
           this.__contribArea.resetValue();
-          this.__nameField.setReadOnly(false);
+          this.__setReadOnlyAndDisableFor(this.__contribArea, false);
         } else {
           this.fireDataEvent("contribSelected", selectedItem);
-          this.__nameField.setReadOnly(true);
+          this.__setReadOnlyAndDisableFor(this.__contribArea, true);
         }
       }, this);
+    },
+
+    __setReadOnlyAndDisableFor: function(widget, readOnly)
+    {
+      if (readOnly === true) {
+        widget.setReadOnly(true);
+        widget.addState("disabled");
+      } else {
+        widget.setReadOnly(false);
+        widget.removeState("disabled");
+      }
     },
 
     __updateAvailableVersions: function(allDownloads, selectBox)
