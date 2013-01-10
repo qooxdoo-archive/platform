@@ -54,7 +54,7 @@ qx.Class.define("contribCatalog.Application",
 
       contribService.addListener("publishSuccess", function(e) {
         contribService.getIndex();
-        contribService.getOne(e.getData());
+        contribService.getOne(e.getData(), true);
       }, this);
 
 

@@ -53,16 +53,19 @@ qx.Class.define("contribCatalog.ContribService",
     __indexStore : null,
     __contribStore : null,
 
-    getOne : function(contribName)
+    getOne : function(contribName, forceReload)
     {
-      var BASE_URL = contribCatalog.ContribService.BASE_URL;
+      var BASE_URL = contribCatalog.ContribService.BASE_URL,
+          reload = (typeof forceReload !== 'undefined') ? forceReload : false;
 
       if (this.__contribStore === null) {
         this.__contribStore = new qx.data.store.Json(BASE_URL+contribName);
         this.__contribStore.bind("model", this, "contrib");
       } else {
         this.__contribStore.setUrl(BASE_URL+contribName);
-        // this.__contribStore.reload();
+        if (reload === true) {
+          this.__contribStore.reload();
+        }
       }
     },
 
