@@ -44,6 +44,8 @@ qx.Class.define("contribCatalog.FormItems", {
     __downloadsUrlField : null,
     __formEntryController : null,
     __categoryBoxController : null,
+    __versionBoxController : null,
+    __contribSelectBoxController : null,
 
     __createView : function()
     {
@@ -119,18 +121,18 @@ qx.Class.define("contribCatalog.FormItems", {
 
         this.__categoryBoxController.setSelection(new qx.data.Array([contribModel.getCategory()]));
 
-        this.__updateAvailableVersions(obj.downloads, this.__versionBox);
+        this.__updateAvailableVersions(obj.downloads, this.__versionBoxController);
+
+        this.__contribSelectBoxController.setSelection(new qx.data.Array([contribModel.getName()]));
     },
 
     updateContribIndex : function(qxModel) {
-        var index = qx.util.Serializer.toNativeObject(qxModel);
-        var versionKeys = Object.keys(index).sort();
-        versionKeys.unshift("New contrib... (or select existing)");
+      var index = qx.util.Serializer.toNativeObject(qxModel);
+      var allContribNames = Object.keys(index).sort();
+      var defaultEntry = "New contrib... (or select existing)";
 
-        this.__contribSelectBox.removeAll();
-        versionKeys.forEach(function(obj) {
-          this.__contribSelectBox.add(new qx.ui.form.ListItem(obj));
-        }, this);
+      allContribNames.unshift(defaultEntry);
+      this.__contribSelectBoxController.setModel(new qx.data.Array(allContribNames));
     },
 
     __createEntryFields : function(form)
@@ -163,11 +165,8 @@ qx.Class.define("contribCatalog.FormItems", {
       // version select box
       this.__versionBox = new qx.ui.form.SelectBox();
 
-      ["New version... (or select existing)", "current"].forEach(function(obj) {
-        var item = new qx.ui.form.ListItem(obj);
-        item.setModel(obj);
-        this.__versionBox.add(item);
-      }, this);
+      var versionModel = new qx.data.Array(["New version... (or select existing)", "current"]);
+      this.__versionBoxController = new qx.data.controller.List(versionModel, this.__versionBox);
 
       this.__versionBox.addListener("changeSelection", function() {
         if (this.__versionBox.getSelection().length === 0) { return; }
@@ -207,6 +206,7 @@ qx.Class.define("contribCatalog.FormItems", {
       this.__contribSelectBox = new qx.ui.form.SelectBox();
       this.__contribSelectBox.setRequired(true);
       this.__contribSelectBox.setWidth(400);
+      this.__contribSelectBoxController = new qx.data.controller.List(null, this.__contribSelectBox);
       form.add(this.__contribSelectBox, "contrib");
 
       this.__contribSelectBox.addListener("changeSelection", function() {
@@ -214,9 +214,13 @@ qx.Class.define("contribCatalog.FormItems", {
 
         var selectedItem = this.__contribSelectBox.getSelection()[0].getLabel();
         if (selectedItem.indexOf("New") === 0) {
-          this.__formEntry.reset();
           this.__contribArea.resetValue();
           this.__setReadOnlyAndDisableFor(this.__contribArea, false);
+          this.__nameField.resetValue();
+          this.__setReadOnlyAndDisableFor(this.__nameField, false);
+          this.__urlField.resetValue();
+          this.__categoryBox.resetSelection();
+          this.__updateAvailableVersions(null, this.__versionBoxController);
         } else {
           this.fireDataEvent("contribSelected", selectedItem);
           this.__setReadOnlyAndDisableFor(this.__contribArea, true);
@@ -235,28 +239,23 @@ qx.Class.define("contribCatalog.FormItems", {
       }
     },
 
-    __updateAvailableVersions: function(allDownloads, selectBox)
+    __updateAvailableVersions: function(allDownloads, selectBoxController)
     {
-      var versionKeys = [];
+      var versionKeys = ["New version... (or select existing)", "current"];
 
       if (allDownloads !== null) {
         allDownloads.forEach(function(obj) {
-          versionKeys.push(obj[0]);
+          if (obj[0] !== "current") {
+            versionKeys.push(obj[0]);
+          }
         }, this);
-
-        if (versionKeys.indexOf("current") === -1) {
-          versionKeys.unshift("current");
-        }
-      } else {
-        versionKeys.unshift("current");
       }
 
-      versionKeys.unshift("New version... (or select existing)");
-
-      selectBox.removeAll();
-      versionKeys.forEach(function(obj) {
-        selectBox.add(new qx.ui.form.ListItem(obj));
-      }, this);
+      selectBoxController.setModel(new qx.data.Array(versionKeys));
+      if (allDownloads === null) {
+        // set current as default version, to get that version first
+        selectBoxController.setSelection(new qx.data.Array(["current"]));
+      }
     }
   }
 });
