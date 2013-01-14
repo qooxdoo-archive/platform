@@ -36,7 +36,6 @@ qx.Class.define("contribCatalog.Application",
         }
       }, this);
 
-
       contribService.addListener("changeContrib", function(e) {
         if (e.getData() !== null) {
            formItems.updateContribFormWith(e.getData());
@@ -54,12 +53,10 @@ qx.Class.define("contribCatalog.Application",
 
       contribService.addListener("publishSuccess", function(e) {
         contribService.getIndex();
-        contribService.getOne(e.getData(), true);
+        contribService.getOne(e.getData());
       }, this);
 
-
       this.getRoot().add(formItems);
-      contribService.getIndex();
     }
   }
 });

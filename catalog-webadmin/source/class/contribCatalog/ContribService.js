@@ -56,23 +56,24 @@ qx.Class.define("contribCatalog.ContribService",
     getOne : function(contribName, forceReload)
     {
       var BASE_URL = contribCatalog.ContribService.BASE_URL,
-          reload = (typeof forceReload !== 'undefined') ? forceReload : false;
+          prevFetchUrl = (this.__contribStore !== null) ? this.__contribStore.getUrl() : '',
+          nextFetchUrl = BASE_URL+contribName;
 
       if (this.__contribStore === null) {
-        this.__contribStore = new qx.data.store.Json(BASE_URL+contribName);
+        this.__contribStore = new qx.data.store.Json(nextFetchUrl);
         this.__contribStore.bind("model", this, "contrib");
       } else {
-        this.__contribStore.setUrl(BASE_URL+contribName);
-        if (reload === true) {
+        if (nextFetchUrl === prevFetchUrl) {
           this.__contribStore.reload();
+        } else {
+          this.__contribStore.setUrl(nextFetchUrl);
         }
       }
     },
 
-    getIndex : function()
+    getIndex : function(forceReload)
     {
-      var BASE_URL = contribCatalog.ContribService.BASE_URL;
-      this.__indexStore.setUrl(BASE_URL);
+      this.__indexStore.reload();
     },
 
     publish : function(formModel)
