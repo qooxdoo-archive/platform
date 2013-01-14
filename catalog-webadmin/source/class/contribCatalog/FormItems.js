@@ -188,11 +188,15 @@ qx.Class.define("contribCatalog.FormItems", {
       // version
       this.__downloadsVersionField = new qx.ui.form.TextField();
       this.__downloadsVersionField.setRequired(true);
-      form.add(this.__downloadsVersionField, "version");
+      this.__downloadsVersionField.setValue("current");
+
+      form.add(this.__downloadsVersionField, "version",
+               qx.util.Validate.regExp(/^current|\d+\.\d+(\.\d+)?(?:-\d+-?)?(?:[-a-zA-Z+][-a-zA-Z0-9\.:]*)?$/,
+                                       "doesn't adhere to http://semver.org and isn't 'current'."));
 
       // url
       this.__downloadsUrlField = new qx.ui.form.TextField();
-      this.__downloadsUrlField.setPlaceholder("https://github.com/{myUser}/{myProject}/archive/master.tar.gz");
+      this.__downloadsUrlField.setPlaceholder("e.g. https://github.com/{myUser}/{myProject}/archive/master.tar.gz");
       this.__downloadsUrlField.setRequired(true);
       form.add(this.__downloadsUrlField, "url", qx.util.Validate.url());
     },
