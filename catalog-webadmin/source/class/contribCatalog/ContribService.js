@@ -101,25 +101,33 @@ qx.Class.define("contribCatalog.ContribService",
     },
 
     __tailorDataObjectFrom : function(model) {
-      var dataObj = {};
+      var dataObj = {},
+          found = false,
+        lastFetchedContrib = this.getContrib();
+
       dataObj.name = model.getName();
       dataObj.projecturl = model.getProjecturl();
       dataObj.category = model.getCategory();
 
-      var found = false;
-      dataObj.downloads = qx.util.Serializer.toNativeObject(this.getContrib().getDownloads()) || {};
-      dataObj.downloads.forEach(function(elem, i, arr) {
-        // version edit
-        if (arr[i][0] === model.getVersion()) {
-          arr[i][1] = model.getUrl();
-          found = true;
-        }
-      });
-      // version create
-      if (found === false) {
+      if (lastFetchedContrib === null || lastFetchedContrib.getName() !== model.getName()) {
+        // new catalog entry with first download entry
+        dataObj.downloads = [];
         dataObj.downloads.push([model.getVersion(), model.getUrl()]);
+      } else {
+        dataObj.downloads = qx.util.Serializer.toNativeObject(this.getContrib().getDownloads()) || {};
+        dataObj.downloads.forEach(function(elem, i, arr) {
+          // version edit
+          if (arr[i][0] === model.getVersion()) {
+            arr[i][1] = model.getUrl();
+            found = true;
+          }
+        });
+        // version create
+        if (found === false) {
+          dataObj.downloads.push([model.getVersion(), model.getUrl()]);
+        }
+        dataObj.downloads.sort();
       }
-      dataObj.downloads.sort();
 
       return dataObj;
     }
