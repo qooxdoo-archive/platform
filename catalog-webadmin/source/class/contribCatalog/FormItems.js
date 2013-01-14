@@ -83,13 +83,15 @@ qx.Class.define("contribCatalog.FormItems", {
       publishButton.addListener("execute", function() {
         if (this.__formEntry.validate()) {
 
-          // TODO: isn't working yet
-          if (this.__contribSelectBox.getSelection()[0].getLabel().indexOf("New") === 0
-              && this.__downloadsVersionField.getValue() !== "current") {
-            alert("Please add a archive location for the current version first (i.e. master/trunk/tip ...)");
+          // if adding a new contrib current version should be provided first
+          if (this.__contribSelectBox.getSelection()[0].getLabel().indexOf("New") === 0 &&
+              this.__downloadsVersionField.getValue() !== "current") {
+            alert("Please add an archive location for the 'current' version first.\n"+
+                  "This version is already prepopulated in the drop-down list 'Add/Edit ...'.\n"+
+                  "An appropriated value would be an URL pointing to the tip of your main branch as archive file.");
+          } else {
+            this.fireDataEvent("publish", formModel);
           }
-
-          this.fireDataEvent("publish", formModel);
         }
       }, this);
 
