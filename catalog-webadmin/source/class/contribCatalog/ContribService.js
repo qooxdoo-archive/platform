@@ -106,7 +106,7 @@ qx.Class.define("contribCatalog.ContribService",
         lastFetchedContrib = this.getContrib();
 
       dataObj.name = model.getName();
-      dataObj.name = model.getAuthor();
+      dataObj.author = model.getAuthor();
       dataObj.projecturl = model.getProjecturl();
       dataObj.category = model.getCategory();
 
