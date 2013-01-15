@@ -57,7 +57,7 @@ qx.Class.define("contribCatalog.FormItems", {
       this.setLayout(grid);
       this.setPadding(10);
 
-      var groupBoxSelection = new qx.ui.groupbox.GroupBox("Add new or edit existing contrib:");
+      var groupBoxSelection = new qx.ui.groupbox.GroupBox("Add new or edit (your own) existing contrib:");
       groupBoxSelection.setLayout(new qx.ui.layout.Canvas());
       this.add(groupBoxSelection, {row: 0, column: 0});
 
@@ -191,7 +191,7 @@ qx.Class.define("contribCatalog.FormItems", {
 
       form.add(this.__downloadsVersionField, "version",
                qx.util.Validate.regExp(/^current|\d+\.\d+(\.\d+)?(?:-\d+-?)?(?:[-a-zA-Z+][-a-zA-Z0-9\.:]*)?$/,
-                                       "doesn't adhere to http://semver.org and isn't 'current'."));
+                                       "doesn't adhere to http://semver.org or isn't 'current'."));
 
       // url
       this.__downloadsUrlField = new qx.ui.form.TextField();
