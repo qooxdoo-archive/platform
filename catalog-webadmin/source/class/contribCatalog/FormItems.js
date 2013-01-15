@@ -35,7 +35,7 @@ qx.Class.define("contribCatalog.FormItems", {
   members : {
     __formEntry: null,
     __contribArea : null,
-    __contribSelectBox : null,
+    __contribBox : null,
     __nameField : null,
     __urlField : null,
     __categoryBox : null,
@@ -45,7 +45,7 @@ qx.Class.define("contribCatalog.FormItems", {
     __formEntryController : null,
     __categoryBoxController : null,
     __versionBoxController : null,
-    __contribSelectBoxController : null,
+    __contribBoxController : null,
 
     __createView : function()
     {
@@ -86,7 +86,7 @@ qx.Class.define("contribCatalog.FormItems", {
         if (this.__formEntry.validate()) {
 
           // if adding a new contrib current version should be provided first
-          if (this.__contribSelectBox.getSelection()[0].getLabel().indexOf("New") === 0 &&
+          if (this.__contribBox.getSelection()[0].getLabel().indexOf("New") === 0 &&
               this.__downloadsVersionField.getValue() !== "current") {
             alert("Please add an archive location for the 'current' version first.\n"+
                   "This version is already prepopulated in the drop-down list 'Add/Edit ...'.\n"+
@@ -123,7 +123,7 @@ qx.Class.define("contribCatalog.FormItems", {
 
         this.__updateAvailableVersions(obj.downloads, this.__versionBoxController);
 
-        this.__contribSelectBoxController.setSelection(new qx.data.Array([contribModel.getName()]));
+        this.__contribBoxController.setSelection(new qx.data.Array([contribModel.getName()]));
     },
 
     updateContribIndex : function(qxModel) {
@@ -132,7 +132,7 @@ qx.Class.define("contribCatalog.FormItems", {
       var defaultEntry = "New contrib... (or select existing)";
 
       allContribNames.unshift(defaultEntry);
-      this.__contribSelectBoxController.setModel(new qx.data.Array(allContribNames));
+      this.__contribBoxController.setModel(new qx.data.Array(allContribNames));
     },
 
     __createEntryFields : function(form)
@@ -203,16 +203,16 @@ qx.Class.define("contribCatalog.FormItems", {
     __createContribSelectionFields: function(form)
     {
       // existing contribs
-      this.__contribSelectBox = new qx.ui.form.SelectBox();
-      this.__contribSelectBox.setRequired(true);
-      this.__contribSelectBox.setWidth(400);
-      this.__contribSelectBoxController = new qx.data.controller.List(null, this.__contribSelectBox);
-      form.add(this.__contribSelectBox, "contrib");
+      this.__contribBox = new qx.ui.form.SelectBox();
+      this.__contribBox.setRequired(true);
+      this.__contribBox.setWidth(400);
+      this.__contribBoxController = new qx.data.controller.List(null, this.__contribBox);
+      form.add(this.__contribBox, "contrib");
 
-      this.__contribSelectBox.addListener("changeSelection", function() {
-        if (this.__contribSelectBox.getSelection().length === 0) { return; }
+      this.__contribBox.addListener("changeSelection", function() {
+        if (this.__contribBox.getSelection().length === 0) { return; }
 
-        var selectedItem = this.__contribSelectBox.getSelection()[0].getLabel();
+        var selectedItem = this.__contribBox.getSelection()[0].getLabel();
         if (selectedItem.indexOf("New") === 0) {
           this.__contribArea.resetValue();
           this.__setReadOnlyAndDisableFor(this.__contribArea, false);
