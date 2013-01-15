@@ -70,7 +70,7 @@ qx.Class.define("contribCatalog.FormItems", {
       this.add(groupBoxEntry, {row: 1, column: 0});
 
       var groupBoxStoreState = new qx.ui.groupbox.GroupBox("Currently stored contribCatalog entry:");
-      groupBoxStoreState.setLayout(new qx.ui.layout.Canvas());
+      groupBoxStoreState.getChildControl("frame").setLayout(new qx.ui.layout.VBox(), {flex:1});
       this.add(groupBoxStoreState, {row: 0, column: 1, rowSpan: 2});
 
       var formSelection = new qx.ui.form.Form();
