@@ -29,13 +29,17 @@ qx.Class.define("contribCatalog.FormItems", {
   construct : function() {
     this.base(arguments);
 
+    this.__loggedInUser = arguments[0];
     this.__createView();
   },
 
   members : {
-    __formEntry: null,
+    __loggedInUser : null,
+    __formEntry : null,
+    __publishButton : null,
     __contribArea : null,
     __contribBox : null,
+    __authorField : null,
     __nameField : null,
     __urlField : null,
     __categoryBox : null,
@@ -79,10 +83,10 @@ qx.Class.define("contribCatalog.FormItems", {
       this.__formEntryController = new qx.data.controller.Form(null, this.__formEntry);
       var formModel = this.__formEntryController.createModel();
 
-      var publishButton = new qx.ui.form.Button("Publish");
-      this.__formEntry.addButton(publishButton);
+      this.__publishButton = new qx.ui.form.Button("Publish");
+      this.__formEntry.addButton(this.__publishButton);
 
-      publishButton.addListener("execute", function() {
+      this.__publishButton.addListener("execute", function() {
         if (this.__formEntry.validate()) {
 
           // if adding a new contrib current version should be provided first
@@ -106,7 +110,7 @@ qx.Class.define("contribCatalog.FormItems", {
       this.__contribArea = new qx.ui.form.TextArea();
       this.__setReadOnlyAndDisableFor(this.__contribArea, true);
       this.__contribArea.setWidth(450);
-      this.__contribArea.setHeight(300);
+      this.__contribArea.setHeight(400);
       groupBoxStoreState.add(this.__contribArea);
     },
 
@@ -115,8 +119,10 @@ qx.Class.define("contribCatalog.FormItems", {
         var formattedJson = contribCatalog.Util.getFormattedJson(obj);
         this.__contribArea.setValue(formattedJson);
 
+        contribModel.bind("author", this.__authorField, "value");
         contribModel.bind("name", this.__nameField, "value");
         contribModel.bind("projecturl", this.__urlField, "value");
+        this.__setReadOnlyAndDisableFor(this.__authorField, true);
         this.__setReadOnlyAndDisableFor(this.__nameField, true);
 
         this.__categoryBoxController.setSelection(new qx.data.Array([contribModel.getCategory()]));
@@ -124,6 +130,13 @@ qx.Class.define("contribCatalog.FormItems", {
         this.__updateAvailableVersions(obj.downloads, this.__versionBoxController);
 
         this.__contribBoxController.setSelection(new qx.data.Array([contribModel.getName()]));
+
+        // publish is only allowed if user=author
+        if (this.__loggedInUser === this.__authorField.getValue()) {
+          this.__setEnableFor(this.__publishButton, true);
+        } else {
+          this.__setEnableFor(this.__publishButton, false);
+        }
     },
 
     updateContribIndex : function(qxModel) {
@@ -137,11 +150,17 @@ qx.Class.define("contribCatalog.FormItems", {
 
     __createEntryFields : function(form)
     {
+      // author
+      this.__authorField = new qx.ui.form.TextField();
+      this.__authorField.setWidth(400);
+      this.__authorField.setRequired(true);
+      this.__setReadOnlyAndDisableFor(this.__authorField, true);
+      form.add(this.__authorField, "author");
+
       // name
       this.__nameField = new qx.ui.form.TextField();
       this.__nameField.setPlaceholder("{myProject}");
       this.__nameField.setRequired(true);
-      this.__nameField.setWidth(400);
       form.add(this.__nameField, "name");
 
       // url

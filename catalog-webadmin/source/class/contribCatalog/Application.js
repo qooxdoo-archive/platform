@@ -21,13 +21,19 @@ qx.Class.define("contribCatalog.Application",
 {
   extend : qx.application.Standalone,
 
+  statics :
+  {
+    // dokuwiki logged in user
+    CURRENT_USER : (typeof JSINFO !== "undefined" && typeof JSINFO.user !== "undefined") ? JSINFO.user : null
+  },
+
   members :
   {
     main : function()
     {
       this.base(arguments);
 
-      var formItems = new contribCatalog.FormItems();
+      var formItems = new contribCatalog.FormItems(contribCatalog.Application.CURRENT_USER);
       var contribService = new contribCatalog.ContribService();
 
       contribService.addListener("changeIndex", function(e) {

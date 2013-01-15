@@ -38,7 +38,7 @@ qx.Class.define("contribCatalog.ContribService",
 
   statics :
   {
-    BASE_URL: "http://qooxdoo.devel/contrib/catalog/"
+    BASE_URL : "http://qooxdoo.devel/contrib/catalog/"
   },
 
   construct : function() {
@@ -106,6 +106,7 @@ qx.Class.define("contribCatalog.ContribService",
         lastFetchedContrib = this.getContrib();
 
       dataObj.name = model.getName();
+      dataObj.name = model.getAuthor();
       dataObj.projecturl = model.getProjecturl();
       dataObj.category = model.getCategory();
 
