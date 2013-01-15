@@ -253,10 +253,20 @@ qx.Class.define("contribCatalog.FormItems", {
     {
       if (readOnly === true) {
         widget.setReadOnly(true);
-        widget.setEnabled(false);
+        // enable copy/paste from readonly textarea
+        if (widget instanceof qx.ui.form.TextArea) {
+          widget.addState("disabled");
+        } else {
+          widget.setEnabled(false);
+        }
       } else {
         widget.setReadOnly(false);
-        widget.setEnabled(true);
+        // enable copy/paste from readonly textarea
+        if (widget instanceof qx.ui.form.TextArea) {
+          widget.removeState("disabled");
+        } else {
+          widget.setEnabled(false);
+        }
       }
     },
 
