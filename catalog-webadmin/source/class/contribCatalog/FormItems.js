@@ -234,10 +234,19 @@ qx.Class.define("contribCatalog.FormItems", {
     {
       if (readOnly === true) {
         widget.setReadOnly(true);
-        widget.addState("disabled");
+        widget.setEnabled(false);
       } else {
         widget.setReadOnly(false);
-        widget.removeState("disabled");
+        widget.setEnabled(true);
+      }
+    },
+
+    __setEnableFor: function(widget, value)
+    {
+      if (value === true) {
+        widget.setEnabled(true);
+      } else {
+        widget.setEnabled(false);
       }
     },
 
