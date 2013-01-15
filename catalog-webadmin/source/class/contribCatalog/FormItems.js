@@ -171,13 +171,13 @@ qx.Class.define("contribCatalog.FormItems", {
       this.__versionBox.addListener("changeSelection", function() {
         if (this.__versionBox.getSelection().length === 0) { return; }
 
-        var selectedItem = this.__versionBox.getSelection()[0].getLabel();
-        if (selectedItem.indexOf("New") === 0) {
+        var curSelectedVersion = this.__versionBox.getSelection()[0].getLabel();
+        if (curSelectedVersion.indexOf("New") === 0) {
           this.__setReadOnlyAndDisableFor(this.__downloadsVersionField, false);
           this.__downloadsVersionField.resetValue();
           this.__downloadsUrlField.resetValue();
         } else {
-          this.__downloadsVersionField.setValue(selectedItem);
+          this.__downloadsVersionField.setValue(curSelectedVersion);
           this.__setReadOnlyAndDisableFor(this.__downloadsVersionField, true);
         }
       }, this);
@@ -212,17 +212,19 @@ qx.Class.define("contribCatalog.FormItems", {
       this.__contribBox.addListener("changeSelection", function() {
         if (this.__contribBox.getSelection().length === 0) { return; }
 
-        var selectedItem = this.__contribBox.getSelection()[0].getLabel();
-        if (selectedItem.indexOf("New") === 0) {
+        var curSelectedContrib = this.__contribBox.getSelection()[0].getLabel();
+        if (curSelectedContrib.indexOf("New") === 0) {
           this.__contribArea.resetValue();
           this.__setReadOnlyAndDisableFor(this.__contribArea, false);
+          this.__authorField.setValue(this.__loggedInUser);
           this.__nameField.resetValue();
           this.__setReadOnlyAndDisableFor(this.__nameField, false);
           this.__urlField.resetValue();
           this.__categoryBox.resetSelection();
           this.__updateAvailableVersions(null, this.__versionBoxController);
+          this.__setEnableFor(this.__publishButton, true);
         } else {
-          this.fireDataEvent("contribSelected", selectedItem);
+          this.fireDataEvent("contribSelected", curSelectedContrib);
           this.__setReadOnlyAndDisableFor(this.__contribArea, true);
         }
       }, this);
