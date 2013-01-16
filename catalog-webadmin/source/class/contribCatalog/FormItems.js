@@ -54,16 +54,26 @@ qx.Class.define("contribCatalog.FormItems", {
     __createView : function()
     {
       var grid = new qx.ui.layout.Grid(20, 5);
-      // grid.setColumnFlex(0, 1);
-      // grid.setColumnFlex(1, 1);
-      grid.setColumnWidth(0, 520);
-      grid.setColumnWidth(1, 520);
+      grid.setColumnFlex(0, 1);
+      grid.setColumnFlex(1, 1);
+      // grid.setColumnWidth(0, 550);
+      // grid.setColumnWidth(1, 550);
       this.setLayout(grid);
       this.setPadding(10);
 
+      var groupBoxCurUser = new qx.ui.groupbox.GroupBox("You are currently logged in as:");
+      var user = new qx.ui.basic.Label(this.__loggedInUser);
+      user.setEnabled(false);
+      groupBoxCurUser.add(user);
+      groupBoxCurUser.setLayout(new qx.ui.layout.Canvas());
+
       var groupBoxSelection = new qx.ui.groupbox.GroupBox("Add new or edit (your own) existing contrib:");
       groupBoxSelection.setLayout(new qx.ui.layout.Canvas());
-      this.add(groupBoxSelection, {row: 0, column: 0});
+
+      var containerContribChoice = new qx.ui.container.Composite(new qx.ui.layout.VBox());
+      containerContribChoice.add(groupBoxSelection);
+      containerContribChoice.add(groupBoxCurUser);
+      this.add(containerContribChoice, {row: 0, column: 0});
 
       var groupBoxEntry = new qx.ui.groupbox.GroupBox("Publish a new/updated contribCatalog entry:");
       groupBoxEntry.setLayout(new qx.ui.layout.Canvas());
@@ -152,7 +162,7 @@ qx.Class.define("contribCatalog.FormItems", {
     {
       // author
       this.__authorField = new qx.ui.form.TextField();
-      this.__authorField.setWidth(400);
+      this.__authorField.setWidth(420);
       this.__authorField.setRequired(true);
       this.__setReadOnlyAndDisableFor(this.__authorField, true);
       form.add(this.__authorField, "author");
