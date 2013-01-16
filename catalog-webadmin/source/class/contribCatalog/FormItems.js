@@ -56,8 +56,6 @@ qx.Class.define("contribCatalog.FormItems", {
       var grid = new qx.ui.layout.Grid(20, 5);
       grid.setColumnFlex(0, 1);
       grid.setColumnFlex(1, 1);
-      // grid.setColumnWidth(0, 550);
-      // grid.setColumnWidth(1, 550);
       this.setLayout(grid);
       this.setPadding(10);
 
@@ -80,7 +78,7 @@ qx.Class.define("contribCatalog.FormItems", {
       this.add(groupBoxEntry, {row: 1, column: 0});
 
       var groupBoxStoreState = new qx.ui.groupbox.GroupBox("Currently stored contribCatalog entry:");
-      groupBoxStoreState.getChildControl("frame").setLayout(new qx.ui.layout.VBox(), {flex:1});
+      groupBoxStoreState.getChildControl("frame").setLayout(new qx.ui.layout.Canvas());
       this.add(groupBoxStoreState, {row: 0, column: 1, rowSpan: 2});
 
       var formSelection = new qx.ui.form.Form();
@@ -113,15 +111,15 @@ qx.Class.define("contribCatalog.FormItems", {
 
       var renderedFormSelection = new qx.ui.form.renderer.Single(formSelection);
       var renderedFormEntry = new qx.ui.form.renderer.Single(this.__formEntry);
-      groupBoxSelection.add(renderedFormSelection);
-      groupBoxEntry.add(renderedFormEntry);
+      renderedFormSelection._getLayout().setColumnFlex(1, 10);
+      renderedFormEntry._getLayout().setColumnFlex(1, 10);
+      groupBoxSelection.add(renderedFormSelection, {edge: 0});
+      groupBoxEntry.add(renderedFormEntry, {edge: 0});
 
       // display all contribs
       this.__contribArea = new qx.ui.form.TextArea();
       this.__setReadOnlyAndDisableFor(this.__contribArea, true);
-      this.__contribArea.setWidth(450);
-      this.__contribArea.setHeight(400);
-      groupBoxStoreState.add(this.__contribArea);
+      groupBoxStoreState.add(this.__contribArea, {edge: 0});
     },
 
     updateContribFormWith : function(contribModel) {
@@ -162,7 +160,6 @@ qx.Class.define("contribCatalog.FormItems", {
     {
       // author
       this.__authorField = new qx.ui.form.TextField();
-      this.__authorField.setWidth(420);
       this.__authorField.setRequired(true);
       this.__setReadOnlyAndDisableFor(this.__authorField, true);
       form.add(this.__authorField, "author");
@@ -234,7 +231,6 @@ qx.Class.define("contribCatalog.FormItems", {
       // existing contribs
       this.__contribBox = new qx.ui.form.SelectBox();
       this.__contribBox.setRequired(true);
-      this.__contribBox.setWidth(400);
       this.__contribBoxController = new qx.data.controller.List(null, this.__contribBox);
       form.add(this.__contribBox, "contrib");
 

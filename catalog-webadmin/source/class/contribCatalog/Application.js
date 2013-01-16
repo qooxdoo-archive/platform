@@ -62,7 +62,7 @@ qx.Class.define("contribCatalog.Application",
         contribService.getOne(e.getData());
       }, this);
 
-      this.getRoot().add(formItems);
+      this.getRoot().add(formItems, {edge: 0});
     }
   }
 });
