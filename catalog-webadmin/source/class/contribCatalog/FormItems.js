@@ -134,11 +134,11 @@ qx.Class.define("contribCatalog.FormItems", {
         this.__setReadOnlyAndDisableFor(this.__authorField, true);
         this.__setReadOnlyAndDisableFor(this.__nameField, true);
 
-        this.__categoryBoxController.setSelection(new qx.data.Array([contribModel.getCategory()]));
+        this.__categoryBoxController.getSelection().setItem(0, contribModel.getCategory());
 
         this.__updateAvailableVersions(obj.downloads, this.__versionBoxController);
 
-        this.__contribBoxController.setSelection(new qx.data.Array([contribModel.getName()]));
+        this.__contribBoxController.getSelection().setItem(0, contribModel.getName());
 
         // publish is only allowed if user=author
         if (this.__loggedInUser === this.__authorField.getValue()) {
@@ -299,7 +299,7 @@ qx.Class.define("contribCatalog.FormItems", {
       selectBoxController.setModel(new qx.data.Array(versionKeys));
       if (allDownloads === null) {
         // set current as default version, to get that version first
-        selectBoxController.setSelection(new qx.data.Array(["current"]));
+        selectBoxController.getSelection().setItem(0, "current");
       }
     }
   }
