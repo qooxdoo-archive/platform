@@ -126,6 +126,7 @@ qx.Class.define("contribCatalog.FormItems", {
         var obj = qx.util.Serializer.toNativeObject(contribModel);
         var formattedJson = contribCatalog.Util.getFormattedJson(obj);
         this.__contribArea.setValue(formattedJson);
+        this.__setReadOnlyAndDisableFor(this.__contribArea, true);
 
         contribModel.bind("author", this.__authorField, "value");
         contribModel.bind("name", this.__nameField, "value");
@@ -240,7 +241,6 @@ qx.Class.define("contribCatalog.FormItems", {
         var curSelectedContrib = this.__contribBox.getSelection()[0].getLabel();
         if (curSelectedContrib.indexOf("New") === 0) {
           this.__contribArea.resetValue();
-          this.__setReadOnlyAndDisableFor(this.__contribArea, false);
           this.__authorField.setValue(this.__loggedInUser);
           this.__nameField.resetValue();
           this.__setReadOnlyAndDisableFor(this.__nameField, false);
@@ -250,7 +250,6 @@ qx.Class.define("contribCatalog.FormItems", {
           this.__setEnableFor(this.__publishButton, true);
         } else {
           this.fireDataEvent("contribSelected", curSelectedContrib);
-          this.__setReadOnlyAndDisableFor(this.__contribArea, true);
         }
       }, this);
     },
@@ -271,7 +270,7 @@ qx.Class.define("contribCatalog.FormItems", {
         if (widget instanceof qx.ui.form.TextArea) {
           widget.removeState("disabled");
         } else {
-          widget.setEnabled(false);
+          widget.setEnabled(true);
         }
       }
     },
