@@ -78,8 +78,8 @@ qx.Class.define("contribCatalog.ContribService",
 
     publish : function(formModel)
     {
-      var BASE_URL = contribCatalog.ContribService.BASE_URL;
-      var data = this.__tailorDataObjectFrom(formModel);
+      var BASE_URL = contribCatalog.ContribService.BASE_URL,
+          data = this.__tailorDataObjectFrom(formModel);
 
       // console.log(data);
 
@@ -103,7 +103,7 @@ qx.Class.define("contribCatalog.ContribService",
     __tailorDataObjectFrom : function(model) {
       var dataObj = {},
           found = false,
-        lastFetchedContrib = this.getContrib();
+          lastFetchedContrib = this.getContrib();
 
       dataObj.name = model.getName();
       dataObj.author = model.getAuthor();
