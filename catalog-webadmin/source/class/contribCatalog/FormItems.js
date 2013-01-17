@@ -26,14 +26,16 @@ qx.Class.define("contribCatalog.FormItems", {
     "contribSelected"   : "qx.event.type.Data"
   },
 
-  construct : function() {
+  construct : function()
+  {
     this.base(arguments);
 
     this.__loggedInUser = arguments[0];
     this.__createView();
   },
 
-  members : {
+  members :
+  {
     __loggedInUser : null,
     __formEntry : null,
     __publishButton : null,
@@ -120,41 +122,6 @@ qx.Class.define("contribCatalog.FormItems", {
       this.__contribArea = new qx.ui.form.TextArea();
       this.__setReadOnlyAndDisableFor(this.__contribArea, true);
       groupBoxStoreState.add(this.__contribArea, {edge: 0});
-    },
-
-    updateContribFormWith : function(contribModel) {
-        var obj = qx.util.Serializer.toNativeObject(contribModel);
-        var formattedJson = contribCatalog.Util.getFormattedJson(obj);
-        this.__contribArea.setValue(formattedJson);
-        this.__setReadOnlyAndDisableFor(this.__contribArea, true);
-
-        contribModel.bind("author", this.__authorField, "value");
-        contribModel.bind("name", this.__nameField, "value");
-        contribModel.bind("projecturl", this.__urlField, "value");
-        this.__setReadOnlyAndDisableFor(this.__authorField, true);
-        this.__setReadOnlyAndDisableFor(this.__nameField, true);
-
-        this.__categoryBoxController.getSelection().setItem(0, contribModel.getCategory());
-
-        this.__updateAvailableVersions(obj.downloads, this.__versionBoxController);
-
-        this.__contribBoxController.getSelection().setItem(0, contribModel.getName());
-
-        // publish is only allowed if user=author
-        if (this.__loggedInUser === this.__authorField.getValue()) {
-          this.__setEnableFor(this.__publishButton, true);
-        } else {
-          this.__setEnableFor(this.__publishButton, false);
-        }
-    },
-
-    updateContribIndex : function(qxModel) {
-      var index = qx.util.Serializer.toNativeObject(qxModel);
-      var allContribNames = Object.keys(index).sort();
-      var defaultEntry = "New contrib... (or select existing)";
-
-      allContribNames.unshift(defaultEntry);
-      this.__contribBoxController.setModel(new qx.data.Array(allContribNames));
     },
 
     __createEntryFields : function(form)
@@ -252,6 +219,43 @@ qx.Class.define("contribCatalog.FormItems", {
           this.fireDataEvent("contribSelected", curSelectedContrib);
         }
       }, this);
+    },
+
+    updateContribFormWith : function(contribModel)
+    {
+        var obj = qx.util.Serializer.toNativeObject(contribModel);
+        var formattedJson = contribCatalog.Util.getFormattedJson(obj);
+        this.__contribArea.setValue(formattedJson);
+        this.__setReadOnlyAndDisableFor(this.__contribArea, true);
+
+        contribModel.bind("author", this.__authorField, "value");
+        contribModel.bind("name", this.__nameField, "value");
+        contribModel.bind("projecturl", this.__urlField, "value");
+        this.__setReadOnlyAndDisableFor(this.__authorField, true);
+        this.__setReadOnlyAndDisableFor(this.__nameField, true);
+
+        this.__categoryBoxController.getSelection().setItem(0, contribModel.getCategory());
+
+        this.__updateAvailableVersions(obj.downloads, this.__versionBoxController);
+
+        this.__contribBoxController.getSelection().setItem(0, contribModel.getName());
+
+        // publish is only allowed if user=author
+        if (this.__loggedInUser === this.__authorField.getValue()) {
+          this.__setEnableFor(this.__publishButton, true);
+        } else {
+          this.__setEnableFor(this.__publishButton, false);
+        }
+    },
+
+    updateContribIndex : function(qxModel)
+    {
+      var index = qx.util.Serializer.toNativeObject(qxModel);
+      var allContribNames = Object.keys(index).sort();
+      var defaultEntry = "New contrib... (or select existing)";
+
+      allContribNames.unshift(defaultEntry);
+      this.__contribBoxController.setModel(new qx.data.Array(allContribNames));
     },
 
     __setReadOnlyAndDisableFor: function(widget, readOnly)
