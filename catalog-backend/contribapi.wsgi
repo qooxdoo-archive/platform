@@ -16,4 +16,4 @@
 #
 # sys.path.insert(0, CUR_DIR)
 
-from contribapi import app as application
+from contrib.api import app as application
