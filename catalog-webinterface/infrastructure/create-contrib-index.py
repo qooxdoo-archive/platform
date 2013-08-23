@@ -20,58 +20,240 @@
 ################################################################################
 
 ##
-# Creates contrib index for contrib.qooxdoo.org
+# Creates (sanitized) contrib index for contrib webinterface.
 ##
 
 import codecs
 import json
 import os
 import sys
+import re
 
-from random import choice
+# --- constants ---
 
-CATALOG_PATH = "../../../contrib-catalog.git"
-IDX_FILENAME = "../website/contribindex.json"
-CATEGORIES = ["theme", "widget", "drawing", "", "tool", "backend"]
+# input / output
+CONTRIB_PATH = "../../../contrib-catalog.git/contributions"
+IDX_FILENAME = "../website/json/contribindex.json"
+# taken from the contrib wiki
+CATEGORIES_DEFAULT = {
+    "theme": [
+        "Aristo",
+        "DarkTheme",
+        "GraydientTheme",
+        "RetroTheme",
+        "SilverBlueTheme"
+    ],
+    "widget": [
+        "Accordion",
+        "CollapsablePanel",
+        "Cropper",
+        "ComboTable",
+        "Dialog",
+        "MutableList",
+        "ProgressBar",
+        "qxe",
+        "SmartTableModel",
+        "TableColumnMenuGrid",
+        "TileView",
+        "TimeChooser",
+        "TimeSpinner",
+        "TokenField",
+        "UploadJavaApplet",
+        "UploadMgr",
+        "UploadWidget"
+    ],
+    "drawing": [
+        "CanvasCell",
+        "OpenFlashChart",
+        "QxDyGraphs",
+        "QxJqPlot",
+        "QxProtovis",
+        "SVG"
+    ],
+    "tool": [
+        "Chrome",
+        "Emacs",
+        "Simulator",
+        "TextMate"
+    ],
+    "backend": [
+        "Hijax",
+        "RpcExample",
+        "RpcJava",
+        "RpcPhp",
+        "RpcPython",
+        "Soap",
+        "QxGC"
+    ]
+}
+# taken from here (which is no valid json because of the comments
+# therefore just copied for now):
+# https://svn.code.sf.net/p/qooxdoo-contrib/code/trunk/
+# ... qooxdoo-contrib/qooxdoo/contribDemobrowser/config.demo.json
+CONTRIBS_DEMOBROWSER = [
+    "Accordion",
+    "Aristo",
+    "CanvasCell",
+    "ComboTable",
+    "Cropper",
+    "DarkTheme",
+    "Dialog",
+    "GraydientTheme",
+    "MutableList",
+    "OpenFlashChart",
+    "qxe",
+    "QxDyGraphs",
+    "QxJqPlot",
+    "QxProtovis",
+    "RetroTheme",
+    "SVG",
+    "SmartTableModel",
+    "SilverBlueTheme",
+    "TimeChooser",
+    "TokenField",
+    "UploadMgr",
+    "collapsablePanel"
+]
+MANIFEST_FILE = "Manifest.json"
+MANIFEST_URL_FORMAT = ("https://github.com/qooxdoo/contrib-catalog/"
+                       "blob/master/contributions/{name}/{version}/"
+                       + MANIFEST_FILE)
+SEM_VER_RE = (r"^(trunk|master|\d+\.\d+(\.\d+)?(?:-[0-9]+-?)?"
+              "(?:[-a-zA-Z+][-a-zA-Z0-9\.:]*)?)$")
 
-# @type [""]
-manifests = []
 
-# @type [{}]
+# --- vars ---
+
+# @type {"name": ["1.0", "master"], "name2" ...}
+contribs = {}
+# @type [{"name": "", "description": "", "summary": "", ...}, { ... }]
 index = []
 
-# collect all trunk or master manifests
-for dirname, dirnames, filenames in os.walk(CATALOG_PATH):
-    for filename in filenames:
-        abspath = os.path.join(dirname, filename)
-        if ("trunk/" in abspath or "master/" in abspath) and abspath.endswith("Manifest.json"):
-           manifests.append(abspath)
 
-if not manifests:
-  print "No manifests collected. Check CATALOG_PATH: " + CATALOG_PATH
-  sys.exit(1)
+# --- helper/sanitizer ---
 
-# collect and tailor their data
-for filepath in manifests:
-    manifest = json.load(codecs.open(filepath, encoding="utf8"))
+def stripHtml(text):
+    return re.sub('<[^<]+?>', '', text)
+
+def truncate(text, chars_amount=120):
+    shorter = text[:chars_amount]
+    if not shorter:
+        return text
+    elif not re.search("\w", shorter[-1]):
+        return shorter
+    else:
+        return shorter + " ..."
+
+def hasDemo(ctb_name):
+    return ctb_name in CONTRIBS_DEMOBROWSER
+
+def trunkToMaster(versions):
+    return ["master" if vers == "trunk" else vers for vers in versions]
+
+def customOrDefaultCategory(ctb_name, categories):
+    if categories:
+        return categories[0]
+
+    for cat in CATEGORIES_DEFAULT:
+        if ctb_name in CATEGORIES_DEFAULT[cat]:
+            return cat
+
+    return ""
+
+def customOrDefaultHomepage(ctb_name, homepage, latest_vers):
+    defaults = ("",
+                "http://qooxdoo.org/",
+                "http://www.qooxdoo.org/",
+                "http://contrib.qooxdoo.org")
+
+    if not homepage or homepage in defaults:
+        return MANIFEST_URL_FORMAT.format(name=ctb_name, version=latest_vers)
+
+    return homepage
+
+def sanitizeLicense(license):
+    # special treatment for too long license
+    license = license.replace("(see http://qooxdoo.org)", "")
+
+    if not license or license == "SomeLicense":
+        return ""
+
+    return license
+
+def sanitizeAuthors(authors):
+    if authors[0] and authors[0]["name"] == "First Author (uid)":
+        authors = []
+
+    return authors
+
+def sanitizeHomepage(homepage):
+    if not homepage or homepage == "http://some.homepage.url/":
+        return ""
+
+    return homepage
+
+def sanitizeVersions(versions):
+    for i, version in enumerate(versions):
+        if not re.search(SEM_VER_RE, version):
+            versions[i] = "master"
+
+    return versions
+
+
+# --- main ---
+
+# collect all contrib versions
+for dirname, dirnames, filenames in os.walk(CONTRIB_PATH):
+    if MANIFEST_FILE in filenames:
+        name = os.path.basename(os.path.dirname(dirname))
+        version = os.path.basename(dirname)
+
+        if name in contribs:
+            contribs[name].append(version)
+        else:
+            contribs[name] = []
+            contribs[name].append(version)
+
+# fail early
+if not contribs:
+    print "No contribs collected. Check CONTRIB_PATH: " + CONTRIB_PATH
+    sys.exit(1)
+
+# collect and tailor contrib data
+for name, versions in contribs.iteritems():
+    join = os.path.join
+    versions.sort()
+    latest_vers = versions[-1]
+    abspath = join(join(join(CONTRIB_PATH, name), latest_vers), MANIFEST_FILE)
+    manifest = json.load(codecs.open(abspath, encoding="utf8"))
     entry = {}
+
     if "info" in manifest:
         data = manifest["info"]
-        data["qooxdoo-versions"] = ["master" if vers=="trunk" else vers for vers in data["qooxdoo-versions"]]
+        data["qooxdoo-versions"] = trunkToMaster(data["qooxdoo-versions"])
         try:
+            category = customOrDefaultCategory(data["name"], data["category"])
+            tmp = sanitizeHomepage(data["homepage"])
+            homepage = customOrDefaultHomepage(name, tmp, latest_vers)
+
             entry["name"] = data["name"]
-            entry["description"] = data["description"]
+            entry["description"] = truncate(stripHtml(data["description"]))
             entry["summary"] = data["summary"]
-            entry["category"] = choice(CATEGORIES)  # random categories to test with
-            entry["authors"] = data["authors"]
-            entry["homepage"] = data["homepage"]
+            entry["category"] = category
+            entry["authors"] = sanitizeAuthors(data["authors"])
+            entry["homepage"] = homepage
+            entry["versions"] = sanitizeVersions(versions)
             entry["qxversions"] = data["qooxdoo-versions"]
-            entry["license"] = data["license"]
+            entry["license"] = sanitizeLicense(data["license"])
+            entry["demobrowser"] = hasDemo(data["name"])
         except KeyError:
             pass
 
     # add to index
     index.append(entry)
+
+# sort index after contrib name
+index = sorted(index, key=lambda k: (k["name"].upper(), k["name"].islower()))
 
 # write index to disc
 raw_json = json.dumps(index)
@@ -80,4 +262,5 @@ idx_file.write(raw_json)
 idx_file.close()
 
 # print success message
-print 'Done. Written index for ' + str(len(index)) + ' contribs into "' + IDX_FILENAME + '".'
+amount = str(len(index))
+print 'Done. Wrote index for '+amount+' contribs into "'+IDX_FILENAME+'".'
