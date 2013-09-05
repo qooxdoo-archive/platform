@@ -211,7 +211,7 @@ body { min-width: 0 }
 
   .info { width: auto }
 
-  .table { width: 724px, max-width: 100%; margin: 0 }
+  .table { width: 724px; max-width: 100%; margin: 0 }
   .table li { list-style-type: none }
 
   .table th[data-sort='ctb-license'],
@@ -235,7 +235,7 @@ body { min-width: 0 }
   .ctb-name { max-width: 120px }
   .ctb-name a { font-size: 80% }
 
-  .table { width: auto; max-width: 100% }
+  .table { width: 100%; max-width: 100% }
 
   .table th[data-sort='ctb-authors'],
   .table th[data-sort='ctb-category'],
@@ -262,7 +262,7 @@ body { min-width: 0 }
   .ctb-name { max-width: 100px }
   .ctb-name a { font-size: 75% }
   .ctb-description { max-width: 260px }
-  .table { width: auto; }
+  .table { width: 100%; }
 
   .table th:first-child,
   .table td:first-child { padding-left: 10px; }
