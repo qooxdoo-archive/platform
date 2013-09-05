@@ -34,58 +34,6 @@ import re
 # input / output
 CONTRIB_PATH = "../../../contrib-catalog.git/contributions"
 IDX_FILENAME = "../website/json/contribindex.json"
-# taken from the contrib wiki
-CATEGORIES_DEFAULT = {
-    "theme": [
-        "Aristo",
-        "DarkTheme",
-        "GraydientTheme",
-        "RetroTheme",
-        "SilverBlueTheme"
-    ],
-    "widget": [
-        "Accordion",
-        "CollapsablePanel",
-        "Cropper",
-        "ComboTable",
-        "Dialog",
-        "MutableList",
-        "ProgressBar",
-        "qxe",
-        "SmartTableModel",
-        "TableColumnMenuGrid",
-        "TileView",
-        "TimeChooser",
-        "TimeSpinner",
-        "TokenField",
-        "UploadJavaApplet",
-        "UploadMgr",
-        "UploadWidget"
-    ],
-    "drawing": [
-        "CanvasCell",
-        "OpenFlashChart",
-        "QxDyGraphs",
-        "QxJqPlot",
-        "QxProtovis",
-        "SVG"
-    ],
-    "tool": [
-        "Chrome",
-        "Emacs",
-        "Simulator",
-        "TextMate"
-    ],
-    "backend": [
-        "Hijax",
-        "RpcExample",
-        "RpcJava",
-        "RpcPhp",
-        "RpcPython",
-        "Soap",
-        "QxGC"
-    ]
-}
 # taken from here (which is no valid json because of the comments
 # therefore just copied for now):
 # https://svn.code.sf.net/p/qooxdoo-contrib/code/trunk/
@@ -150,13 +98,9 @@ def hasDemo(ctb_name):
 def trunkToMaster(versions):
     return ["master" if vers == "trunk" else vers for vers in versions]
 
-def customOrDefaultCategory(ctb_name, categories):
+def getFirstCategory(categories):
     if categories:
         return categories[0]
-
-    for cat in CATEGORIES_DEFAULT:
-        if ctb_name in CATEGORIES_DEFAULT[cat]:
-            return cat
 
     return ""
 
@@ -172,9 +116,6 @@ def customOrDefaultHomepage(ctb_name, homepage, latest_vers):
     return homepage
 
 def sanitizeLicense(license):
-    # special treatment for too long license
-    license = license.replace("(see http://qooxdoo.org)", "")
-
     if not license or license == "SomeLicense":
         return ""
 
@@ -232,14 +173,13 @@ for name, versions in contribs.iteritems():
         data = manifest["info"]
         data["qooxdoo-versions"] = trunkToMaster(data["qooxdoo-versions"])
         try:
-            category = customOrDefaultCategory(data["name"], data["category"])
             tmp = sanitizeHomepage(data["homepage"])
             homepage = customOrDefaultHomepage(name, tmp, latest_vers)
 
             entry["name"] = data["name"]
             entry["description"] = truncate(stripHtml(data["description"]))
             entry["summary"] = data["summary"]
-            entry["category"] = category
+            entry["category"] = getFirstCategory(data["category"])
             entry["authors"] = sanitizeAuthors(data["authors"])
             entry["homepage"] = homepage
             entry["versions"] = sanitizeVersions(versions)
