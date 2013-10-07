@@ -34,38 +34,12 @@ import re
 # input / output
 CONTRIB_PATH = "../../../contrib-catalog.git/contributions"
 IDX_FILENAME = "../website/json/contribindex.json"
-# taken from here (which is no valid json because of the comments
-# therefore just copied for now):
-# https://svn.code.sf.net/p/qooxdoo-contrib/code/trunk/
-# ... qooxdoo-contrib/qooxdoo/contribDemobrowser/config.demo.json
-CONTRIBS_DEMOBROWSER = [
-    "Accordion",
-    "Aristo",
-    "CanvasCell",
-    "ComboTable",
-    "Cropper",
-    "DarkTheme",
-    "Dialog",
-    "GraydientTheme",
-    "MutableList",
-    "OpenFlashChart",
-    "qxe",
-    "QxDyGraphs",
-    "QxJqPlot",
-    "QxProtovis",
-    "RetroTheme",
-    "SVG",
-    "SmartTableModel",
-    "SilverBlueTheme",
-    "TimeChooser",
-    "TokenField",
-    "UploadMgr",
-    "collapsablePanel"
-]
+
 MANIFEST_FILE = "Manifest.json"
-MANIFEST_URL_FORMAT = ("https://github.com/qooxdoo/contrib-catalog/"
-                       "blob/master/contributions/{name}/{version}/"
-                       + MANIFEST_FILE)
+CONTRIB_URL_FORMAT = ("https://github.com/qooxdoo/contrib-catalog/"
+                           "blob/master/contributions/{name}/")
+MANIFEST_URL_FORMAT = CONTRIB_URL_FORMAT + "{version}/" + MANIFEST_FILE
+
 SEM_VER_RE = (r"^(trunk|master|\d+\.\d+(\.\d+)?(?:-[0-9]+-?)?"
               "(?:[-a-zA-Z+][-a-zA-Z0-9\.:]*)?)$")
 
@@ -85,15 +59,18 @@ def stripHtml(text):
 
 def truncate(text, chars_amount=120):
     shorter = text[:chars_amount]
-    if not shorter:
+    if not shorter or shorter == text:
         return text
-    elif not re.search("\w", shorter[-1]):
+    elif shorter[-1] == '.':
         return shorter
     else:
-        return shorter + " ..."
-
-def hasDemo(ctb_name):
-    return ctb_name in CONTRIBS_DEMOBROWSER
+        ellipsis = ""
+        if (len(text) >= len(shorter)+1 and
+            re.search('\w', text[chars_amount])):
+            ellipsis = "..."
+        else:
+            ellipsis = " ..."
+        return shorter + ellipsis
 
 def trunkToMaster(versions):
     return ["master" if vers == "trunk" else vers for vers in versions]
@@ -104,22 +81,22 @@ def getFirstCategory(categories):
 
     return ""
 
-def customOrDefaultHomepage(ctb_name, homepage, latest_vers):
-    defaults = ("",
-                "http://qooxdoo.org/",
-                "http://www.qooxdoo.org/",
-                "http://contrib.qooxdoo.org")
-
-    if not homepage or homepage in defaults:
-        return MANIFEST_URL_FORMAT.format(name=ctb_name, version=latest_vers)
-
-    return homepage
-
 def sanitizeLicense(license):
     if not license or license == "SomeLicense":
         return ""
 
     return license
+
+def sanitizeHomepage(homepage):
+    defaults = ("http://some.homepage.url/",
+                "http://qooxdoo.org/",
+                "http://www.qooxdoo.org/",
+                "http://contrib.qooxdoo.org")
+
+    if not homepage or homepage in defaults:
+        return ""
+
+    return homepage
 
 def sanitizeAuthors(authors):
     if authors[0] and authors[0]["name"] == "First Author (uid)":
@@ -127,19 +104,12 @@ def sanitizeAuthors(authors):
 
     return authors
 
-def sanitizeHomepage(homepage):
-    if not homepage or homepage == "http://some.homepage.url/":
-        return ""
-
-    return homepage
-
 def sanitizeVersions(versions):
     for i, version in enumerate(versions):
         if not re.search(SEM_VER_RE, version):
             versions[i] = "master"
 
     return versions
-
 
 # --- main ---
 
@@ -173,19 +143,22 @@ for name, versions in contribs.iteritems():
         data = manifest["info"]
         data["qooxdoo-versions"] = trunkToMaster(data["qooxdoo-versions"])
         try:
-            tmp = sanitizeHomepage(data["homepage"])
-            homepage = customOrDefaultHomepage(name, tmp, latest_vers)
-
             entry["name"] = data["name"]
-            entry["description"] = truncate(stripHtml(data["description"]))
+            entry["description"] = stripHtml(data["description"])
+            entry["shortdesc"] = truncate(stripHtml(data["description"]))
             entry["summary"] = data["summary"]
             entry["category"] = getFirstCategory(data["category"])
             entry["authors"] = sanitizeAuthors(data["authors"])
-            entry["homepage"] = homepage
-            entry["versions"] = sanitizeVersions(versions)
-            entry["qxversions"] = data["qooxdoo-versions"]
+            entry["homepage"] = sanitizeHomepage(data["homepage"])
+            entry["versions"] = sanitizeVersions(versions)[::-1]
+            entry["qxversions"] = data["qooxdoo-versions"][::-1]
             entry["license"] = sanitizeLicense(data["license"])
-            entry["demobrowser"] = hasDemo(data["name"])
+            entry["demos"] = data["demos"] if "demos" in data else []
+            entry["keywords"] = data["keywords"] if "keywords" in data else []
+
+            entry["catalogurl"] = {}
+            entry["catalogurl"]["base"] = CONTRIB_URL_FORMAT.format(name=name)
+            entry["catalogurl"]["latest"] = MANIFEST_URL_FORMAT.format(name=name, version=latest_vers)
         except KeyError:
             pass
 
