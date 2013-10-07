@@ -67,17 +67,20 @@
 
       <div class="container clearfix">
         <header class="info">
-          <h1>Browse qooxdoo contributions</h1>
-          <h2>What am I looking at?</h2>
-          <p>The data you see here is gathered from the <code>Manifest.json</code> files (latest version
-             in each case) from the <a href="https://github.com/qooxdoo/contrib-catalog/">qooxdoo contrib-catalog</a>.</p>
-          <h2>How do I use a contribution listed here?</h2>
-          <p>Head on over to the
-             <a href="http://manual.qooxdoo.org/current/pages/development/contrib.html">contrib manual page</a>,
-             which explains working with qooxdoo contributions.</p>
+          <div class="overview">
+            <h1>Browse qooxdoo contributions</h1>
+            <h2>What am I looking at?</h2>
+            <p>The data you see here is gathered from the <code>Manifest.json</code> files (latest version
+               in each case) from the <a href="https://github.com/qooxdoo/contrib-catalog/">qooxdoo contrib-catalog</a>.</p>
+            <h2>How do I use a contribution listed here?</h2>
+            <p>Head on over to the
+               <a href="http://manual.qooxdoo.org/current/pages/development/contrib.html">contrib manual page</a>,
+               which explains working with qooxdoo contributions.</p>
+          </div>
+          <div class="detail hidden"><a href="#">back to overview</a></div>
         </header>
         <section class="main">
-          <div id="loading">
+          <div class="message contribs-loading">
             <p>Loading contribs...</p>
           </div>
           <div id="contribs" class="clearfix"></div>
@@ -88,7 +91,7 @@
       <div id="footer-wrapper">
         <footer id="footer">
           <div id="supported-by">
-            <a href="http://1and1.com"><img src="http://resources.qooxdoo.org/images/1and1.png"></a>
+            <a href="http://1and1.com"><img alt="1and1" src="http://resources.qooxdoo.org/images/1and1.png"></a>
             <p class="claim">Brought to you by <a href="http://1and1.com">1&amp;1</a>, one of the world's leading web hosts</p>
             <p class="legal">© 1&amp;1 Internet AG <span class="legal-link"><a href="http://qooxdoo.org/legal">Legal notice</a></span></p>
           </div>
@@ -129,13 +132,13 @@
           <div id="meta">
             <div class="social">
               <a href="http://twitter.com/qooxdoo">
-                <img src="http://resources.qooxdoo.org/images/twitter.png">
+                <img alt="twitter" src="http://resources.qooxdoo.org/images/twitter.png">
               </a>
               <a href="https://www.facebook.com/pages/qooxdoo/187101324711780">
-                <img src="http://resources.qooxdoo.org/images/facebook.png">
+                <img alt="facebook" src="http://resources.qooxdoo.org/images/facebook.png">
               </a>
               <a href="http://feeds.feedburner.com/qooxdoo/news/content">
-                <img src="http://resources.qooxdoo.org/images/feed.png">
+                <img alt="feed" src="http://resources.qooxdoo.org/images/feed.png">
               </a>
             </div>
           </div>
@@ -145,7 +148,7 @@
 
     </div>
   </body>
-  <script type="text/template" id="contribs-template">
+  <script type="text/template" id="ctb-overview-tmpl">
     <div>
       <table class="table">
         <caption>
@@ -155,57 +158,101 @@
         <thead>
           <tr>
             <th class="sort" data-sort="ctb-name">Name</th>
-            <th class="sort" data-sort="ctb-description">Description</th>
+            <th class="sort" data-sort="ctb-shortdesc">Description</th>
             <th class="sort" data-sort="ctb-category">Category</th>
-            <th class="sort" data-sort="ctb-authors">Author</th>
-            <th class="sort" data-sort="ctb-versions">Versions</th>
-            <th class="sort" data-sort="ctb-qxversions">qooxdoo</th>
-            <th class="sort" data-sort="ctb-license">License</th>
+            <th class="hidden sort" data-sort="ctb-authors">Authors</th>
+            <th class="hidden sort" data-sort="ctb-versions">Authors</th>
+            <th class="hidden sort" data-sort="ctb-qxversions">Authors</th>
+            <th class="hidden sort" data-sort="ctb-license">Authors</th>
           </tr>
         </thead>
         <tbody class="list">
           {{#contribs}}
-            <tr class="{{ category }}">
-              <td class="ctb-name"><a title="{{ description }}" href="{{ homepage }}">{{ name }}</a>
-                {{#demobrowser}}<a class="demo" href="http://demo.qooxdoo.org/contrib/demobrowser/#{{ name }}">(demo)</a>{{/demobrowser}}</td>
-              <td class="ctb-description" title="{{ description }}"><p>{{ description }}</p></td>
+            <tr id="list-{{ name }}" data-ctb-name="{{ name }}">
+              <td class="ctb-name"><h3>{{ name }}<h3></td>
+              <td class="ctb-shortdesc" title="{{ shortdesc }}"><p>{{ shortdesc }}</p></td>
               <td class="ctb-category">{{ category }}</td>
-              <td class="ctb-authors">
-                <ul>
-                {{#authors}}
-                  <li class="ctb-author">{{ name }}</li>
-                {{/authors}}
-                </ul>
+              <td class="hidden ctb-authors"> <ul>{{#authors}}<li class="ctb-author">{{ name }}</li>{{/authors}}</ul> </td>
+              <td class="hidden ctb-versions">
+                <ul>{{#versions}}<li class="ctb-version"><a href="{{ catalogurl.base }}{{ . }}/Manifest.json">{{ . }}</a></li>{{/versions}}</ul>
               </td>
-              <td class="ctb-versions">
-                <ul>
-                {{#versions}}
-                  <li class="ctb-version">
-                    <a href="https://github.com/qooxdoo/contrib-catalog/blob/master/contributions/{{ name }}/{{ . }}/Manifest.json">{{ . }}</a>
-                  </li>
-                {{/versions}}
-                </ul>
-              </td>
-              <td class="ctb-qxversions">
-                <ul>
-                {{#qxversions}}
-                  <li class="ctb-version">{{ . }}</li>
-                {{/qxversions}}
-                </ul>
-              </td>
-              <td class="ctb-license">{{ license }}</td>
+              <td class="hidden ctb-qxversions"> <ul>{{#qxversions}}<li class="ctb-qxversion">{{ . }}</li>{{/qxversions}}</ul> </td>
+              <td class="hidden ctb-license">{{ license }}</td>
             </tr>
           {{/contribs}}
         </tbody>
       </table>
       <div class="clearfix"></div>
-      <div class="message" id="search-notfound">No matching contribs found.</div>
+      <div class="message hidden search-notfound">No matching contribs found.</div>
+    </div>
+  </script>
+  <script type="text/template" id="ctb-detail-tmpl">
+    <div>
+      <section class="contrib-detail">
+        <h1 class="ctb-name">{{ name }}</h1>
+        <p class="ctb-description">{{ description }}</p>
+        <dl>
+          <dt>Homepage:</dt>
+          {{#homepage}}<dd><a class="ctb-homepage" href="{{ homepage }}">{{ homepage }}</a></dd>{{/homepage}}
+          {{^homepage}}<dd class="issue" ><a class="ctb-homepage" href="{{ catalogurl.latest }}">invalid/missing - please fix</a></dd>{{/homepage}}
+          {{#demos.0}}
+            <dt>Demos:</dt>
+            <dd>
+              <ul>
+                {{#demos}}<li class="ctb-demo"><a href="{{ url }}" target="_blank">{{ name }}</a></li>{{/demos}}
+              </ul>
+            </dd>
+          {{/demos.0}}
+          <dt class="separator">Versions:</dt>
+          <dd class="separator">
+            <ul>
+              {{#versions}}<li class="ctb-version"><a href="{{ catalogurl.base }}{{ . }}/Manifest.json">{{ . }}</a></li>{{/versions}}
+            </ul>
+          </dd>
+          <dt>qooxdoo<sup>*</sup>:</dt>
+          <dd>
+            <ul>
+              {{#qxversions}}<li class="ctb-qxversion">{{ . }}</li>{{/qxversions}}
+            </ul>
+          </dd>
+          <dt class="separator">License:</dt>
+          {{#license}}<dd class="ctb-license separator">{{ license }}</dd>{{/license}}
+          {{^license}}<dd class="issue ctb-license separator"><a href="{{ catalogurl.latest }}">invalid/missing - please fix</a></dd>{{/license}}
+          <dt>Authors:</dt>
+          <dd>
+            <ul>
+              {{#authors}}<li class="ctb-author">{{#email}}<a href="mailto:{{ email }}">{{/email}}{{ name }}{{#email}}</a>{{/email}}</li>{{/authors}}
+              {{^authors}}<li class="issue ctb-author"><a href="{{ catalogurl.latest }}">invalid/missing - please fix</a></li>{{/authors}}
+            </ul>
+          </dd>
+          {{#category.0}}
+            <dt>Category:</dt>
+            <dd>
+              <ul>
+              {{#category}}<li class="ctb-category">{{ category }}</li>{{/category}}
+              </ul>
+            </dd>
+          {{/category.0}}
+          {{#keywords.0}}
+            <dt>Keywords:</dt>
+            <dd>
+              <ul>
+              {{#keywords}}<li class="ctb-keyword">{{ . }}</li>{{/keywords}}
+              </ul>
+            </dd>
+          {{/keywords.0}}
+        </dl>
+        <ul class="notes">
+          <li>* some contribs will possibly also run with a more current version of qooxdoo.</li>
+        </ul>
+      </section>
     </div>
   </script>
   <script src="script/list.min.js"></script>
   <script src="script/q-core-3.1.min.js"></script>
   <script src="script/q-io-3.1.min.js"></script>
   <script src="script/q-template-3.1.min.js"></script>
+  <script src="script/q-dataset-3.1.min.js"></script>
   <script src="script/main.js"></script>
   <script src="http://resources.qooxdoo.org/javascripts/application.js"></script>
 </html>
