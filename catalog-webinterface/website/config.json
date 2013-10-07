@@ -78,7 +78,8 @@
       "run" : [
         "build-core-min",
         "build-module-io-min",
-        "build-module-template-min"
+        "build-module-template-min",
+        "build-module-dataset-min"
       ]
     }
   }
