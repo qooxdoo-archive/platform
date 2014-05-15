@@ -24,7 +24,7 @@
     "validate-config"
   ],
 
-  "default-job" : "build-min",
+  "default-job" : "build-module-custom-min",
 
   "config-warnings" :
   {
