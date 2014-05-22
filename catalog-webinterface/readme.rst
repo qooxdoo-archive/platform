@@ -13,4 +13,5 @@ website
 See also:
 
 * `qooxdoo <http://qooxdoo.org>`_
-* `Current qooxdoo-contrib <http://qooxdoo.org/contrib>`_
+* `qooxdoo contrib <http://qooxdoo.org/contrib>`_
+* `qooxdoo contrib catalog website <http://qooxdoo.org/contrib/catalog>`_
