@@ -1,5 +1,13 @@
+Disclaimer
+==========
+
+The code of this repo is outdated or was merged into the catalog repo.
+Edit the catalog website (branch gh-pages) or the create-contrib-index.py
+script there and not here anymore. This repo is meant to be an attic
+and will likely be removed at some point.
+
 About
-================
+=====
 
 This repo contains code, files, scripts, helpers and all kind of stuff that we need for the
 qooxdoo-contrib 2.0 platform. This infrastructure will help qooxdoo users to provide
