@@ -1,10 +1,11 @@
-Disclaimer
-==========
+Deprecation
+===========
 
 The code of this repo is outdated or was merged into the catalog repo.
 Edit the catalog website (``gh-pages`` branch) or the create-contrib-index.py
-script there and not here anymore. This repo is meant to be an attic
-and will likely be removed at some point.
+script there and not here anymore. 
+
+*This repo is meant to be an attic and will likely be removed at some point*.
 
 About
 =====
